@@ -1,6 +1,6 @@
 ---
 // Layout for author profile pages: sidebar with avatar/social links and main MDX bio slot
-import { getTranslation } from "~/i18n";
+import { getTranslations } from "~/i18n";
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import MDXLayout from "./MDXLayout.astro";
@@ -10,7 +10,7 @@ type Props = CollectionEntry<"author">["data"];
 
 const { language, name, avatar, occupation, company, email, link } = Astro.props;
 
-const t = await getTranslation(language, "common");
+const t = getTranslations(language, "common");
 ---
 
 <style>

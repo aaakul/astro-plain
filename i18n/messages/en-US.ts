@@ -1,5 +1,3 @@
-import type { TranslationSchema } from "./zh-Hans";
-
 const enUS = {
   common: {
     about: "About",
@@ -62,6 +60,6 @@ const enUS = {
     dark: "Dark",
     light: "Light",
   },
-} as const satisfies TranslationSchema;
+} as const;
 
 export default enUS;

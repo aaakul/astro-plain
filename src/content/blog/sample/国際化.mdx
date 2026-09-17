@@ -1,9 +1,9 @@
-﻿---
+---
 title: "国際化ガイド"
 summary: "Astro Plain の国際化（i18n）ガイド：翻訳関数の使い方と新しい言語の追加手順。"
 translationKey: "i18n-guide"
 date: "2026-09-01T12:00:00Z"
-lastmod: "2026-09-01T12:00:00Z"
+lastmod: "2026-09-17T17:00:00Z"
 tags: ["Astro", "i18n", "国際化", "ガイド"]
 categories: ["サンプル"]
 language: "ja-JP"
@@ -26,8 +26,8 @@ isCanonical: false
 <FileTree>
 
 - i18n/
-  - **index.ts** 言語タイプと定数の定義
-  - **utils.ts** 翻訳ユーティリティ関数
+  - **index.ts** 国際化コア設定
+  - **utils.ts** 互換性ユーティリティのエクスポート
   - messages/ 各言語の翻訳辞書
     - **zh-Hans.ts** 中国語辞書
     - **en-US.ts** 英語辞書
@@ -47,15 +47,15 @@ isCanonical: false
 
 ## 翻訳関数
 
-Astro のページやコンポーネントでは、`getTranslation(lang, namespace?)` を使って翻訳関数 `t` を取得します。
+本プロジェクトの i18n 翻訳は [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl) により実装されています。
 
 ### 基本的な使い方
 
-言語コードを渡して `getTranslation` を呼び出した後、`t("namespace.key")` で対応する翻訳を取得できます。
+言語コードを渡して `getTranslations` を呼び出した後、`t("namespace.key")` で対応する翻訳を取得できます：
 
-```astro {11} "t("common.home")"
+```astro {10} "t("common.home")"
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 
 interface Props {
   lang: Lang;
@@ -63,8 +63,7 @@ interface Props {
 
 const { lang } = Astro.props;
 
-// 翻訳関数を取得する
-const t = await getTranslation(lang);
+const t = getTranslations(lang);
 ---
 
 <nav>
@@ -76,16 +75,16 @@ const t = await getTranslation(lang);
 
 ### 名前空間のバインド（推奨）
 
-コンポーネント内で特定の名前空間のキーを主に使用する場合は、初期化時に名前空間を指定することで、呼び出し時にキー名だけを渡すことができます。
+コンポーネント内で特定の名前空間のキーを主に使用する場合は、初期化時に名前空間を指定することで、呼び出し時にキー名だけを渡すことができます：
 
 ```astro title="src/components/Header.astro" {7} "tCommon("site_title")"
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 
 const { lang } = Astro.props;
 
 // `common` 名前空間をバインドする
-const tCommon = await getTranslation(lang, "common");
+const tCommon = getTranslations(lang, "common");
 ---
 
 <header>
@@ -98,7 +97,7 @@ const tCommon = await getTranslation(lang, "common");
 
 ```astro
 ---
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 {
@@ -109,17 +108,19 @@ const t = await getTranslation(lang, "common");
 <p>{t("link_to", { title: "Astro" })}</p>
 ```
 
+詳しい使い方は[ドキュメント](https://github.com/aaakul/ts-intl#readme)を参照してください。
+
 ---
 
 ## 新しい言語の追加
 
-サイトに新しい言語（例：フランス語 `fr-FR`）を追加するには、以下の 3 ステップだけで完了します。
+サイトに新しい言語（例：フランス語 `fr-FR`）を追加するには、以下の 4 ステップだけで完了します：
 
 <Steps>
 
 1. **サイト設定に言語コードを追加する**
 
-   `site.config.ts` を開き、`languageNameMap` に新しい言語コードと表示名を追加します。
+   `site.config.ts` を開き、`languageNameMap` に新しい言語コードと表示名を追加します：
 
    ```typescript title="site.config.ts" ins={7}
    const SiteConfig = {
@@ -135,12 +136,10 @@ const t = await getTranslation(lang, "common");
 
 2. **言語辞書ファイルを作成する**
 
-   `i18n/messages/` ディレクトリに新しいファイル `fr-FR.ts` を作成します。既存の辞書ファイルをコピーして翻訳テキストを書き換えることを推奨します。
+   `i18n/messages/` ディレクトリに新しいファイル `fr-FR.ts` を作成します。既存の辞書ファイルをコピーして翻訳テキストを書き換えることを推奨します：
 
    ```typescript title="i18n/messages/fr-FR.ts"
-   import type { TranslationSchema } from "./zh-Hans";
-
-   const frFR: TranslationSchema = {
+   const frFR = {
      common: {
        home: "Accueil",
        about: "À propos",
@@ -148,28 +147,31 @@ const t = await getTranslation(lang, "common");
        page_num: "Page {num}",
        // ... 残りのエントリを翻訳する
      },
-   };
+   } as const;
 
    export default frFR;
    ```
 
 3. **新しい辞書を登録する**
 
-   `i18n/utils.ts` を開き、新しい辞書をインポートして `translations` オブジェクトに登録します。
+   `i18n/index.ts` を開き、新しい辞書をインポートして `createI18n` の `messages` 設定に登録します：
 
-   ```typescript title="i18n/utils.ts" ins={4,11}
-   import zhHans, { type Translation, type TranslationSchema } from "./messages/zh-Hans";
+   ```typescript title="i18n/index.ts" ins={4,13}
+   import zhHans from "./messages/zh-Hans";
    import enUS from "./messages/en-US";
    import jaJP from "./messages/ja-JP";
    import frFR from "./messages/fr-FR";
-   import type { Lang } from "./";
 
-   const translations: Record<Lang, TranslationSchema> = {
-     "zh-Hans": zhHans,
-     "en-US": enUS,
-     "ja-JP": jaJP,
-     "fr-FR": frFR,
-   };
+   export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
+     createI18n({
+       defaultLanguage: "zh-Hans",
+       messages: {
+         "zh-Hans": zhHans,
+         "en-US": enUS,
+         "ja-JP": jaJP,
+         "fr-FR": frFR,
+       },
+     });
    ```
 
 4. **新しい言語の著者情報を追加する**

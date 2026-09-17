@@ -1,5 +1,5 @@
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 import { type BlogCoreContent } from "~/lib/content-utils";
 import PostCard from "./PostCard.astro";
 
@@ -12,7 +12,7 @@ type Props = {
 
 const { posts, lang, maxDisplay, template = "full" } = Astro.props;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 
 const displayPosts = maxDisplay ? posts.slice(0, maxDisplay) : posts;
 ---

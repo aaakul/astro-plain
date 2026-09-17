@@ -7,7 +7,7 @@ import Steps from "@/components/mdx/Steps.astro";
 import FileTree from "@/components/mdx/FileTree.astro";
 import Tabs from "@/components/mdx/Tabs.astro";
 import TabItem from "@/components/mdx/TabItem.astro";
-import { getTranslation } from "~/i18n";
+import { getTranslations } from "~/i18n";
 import { slug } from "github-slugger";
 import Icon from "@/components/ui/Icon.astro";
 
@@ -33,7 +33,7 @@ const { author } = Astro.props;
 
 const { name, avatar } = author.data;
 const { Content } = await render(author);
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 <RootLayout

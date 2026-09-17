@@ -1,7 +1,7 @@
 ---
 import Topic from "@/components/blog/Topic.astro";
 import RootLayout from "@/layouts/RootLayout.astro";
-import { AVAILABLE_LANG, getTranslation } from "~/i18n";
+import { AVAILABLE_LANG, getTranslations } from "~/i18n";
 import { getStats } from "~/lib/content-utils";
 import Search from "@/components/Search.astro";
 
@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
 const { lang } = Astro.params;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 
 // Retrieve tag and category frequency statistics for quick filter links
 const tagStats = await getStats(lang, "tags");

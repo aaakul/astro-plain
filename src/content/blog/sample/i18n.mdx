@@ -1,9 +1,9 @@
-﻿---
+---
 title: "Internationalization Guide"
 summary: "A guide to i18n in Astro Plain: how to use translation functions and add new languages."
 translationKey: "i18n-guide"
 date: "2026-09-01T12:00:00Z"
-lastmod: "2026-09-01T12:00:00Z"
+lastmod: "2026-09-17T17:00:00Z"
 tags: ["Astro", "i18n", "Internationalization", "Guide"]
 categories: ["Examples"]
 language: "en-US"
@@ -26,8 +26,8 @@ isCanonical: false
 <FileTree>
 
 - i18n/
-  - **index.ts** Language type and constant definitions
-  - **utils.ts** Translation utility functions
+  - **index.ts** Core i18n configuration
+  - **utils.ts** Compatibility utility exports
   - messages/ Translation dictionaries per language
     - **zh-Hans.ts** Chinese dictionary
     - **en-US.ts** English dictionary
@@ -47,15 +47,15 @@ isCanonical: false
 
 ## Translation Functions
 
-In an Astro page or component, use `getTranslation(lang, namespace?)` to obtain the translation function `t`.
+The i18n translations in this project are powered by [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl).
 
 ### Basic Usage
 
-After calling `getTranslation` with a language code, use `t("namespace.key")` to retrieve the corresponding translation:
+After calling `getTranslations` with a language code, use `t("namespace.key")` to retrieve the corresponding translation:
 
-```astro {11} "t("common.home")"
+```astro {10} "t("common.home")"
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 
 interface Props {
   lang: Lang;
@@ -63,8 +63,7 @@ interface Props {
 
 const { lang } = Astro.props;
 
-// Get the translation function
-const t = await getTranslation(lang);
+const t = getTranslations(lang);
 ---
 
 <nav>
@@ -80,12 +79,12 @@ If a component primarily uses keys from a single namespace, you can specify the 
 
 ```astro title="src/components/Header.astro" {7} "tCommon("site_title")"
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 
 const { lang } = Astro.props;
 
 // Bind the `common` namespace
-const tCommon = await getTranslation(lang, "common");
+const tCommon = getTranslations(lang, "common");
 ---
 
 <header>
@@ -98,7 +97,7 @@ const tCommon = await getTranslation(lang, "common");
 
 ```astro
 ---
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 {
@@ -109,11 +108,13 @@ const t = await getTranslation(lang, "common");
 <p>{t("link_to", { title: "Astro" })}</p>
 ```
 
+For more usage details, please refer to the [documentation](https://github.com/aaakul/ts-intl#readme).
+
 ---
 
 ## Adding a New Language
 
-Adding a new language to the site (e.g., French `fr-FR`) takes just 3 steps:
+Adding a new language to the site (e.g., French `fr-FR`) takes just 4 steps:
 
 <Steps>
 
@@ -138,9 +139,7 @@ Adding a new language to the site (e.g., French `fr-FR`) takes just 3 steps:
    Create a new file `fr-FR.ts` in the `i18n/messages/` directory. It is recommended to copy an existing dictionary file and replace the translation text:
 
    ```typescript title="i18n/messages/fr-FR.ts"
-   import type { TranslationSchema } from "./zh-Hans";
-
-   const frFR: TranslationSchema = {
+   const frFR = {
      common: {
        home: "Accueil",
        about: "À propos",
@@ -148,28 +147,31 @@ Adding a new language to the site (e.g., French `fr-FR`) takes just 3 steps:
        page_num: "Page {num}",
        // ... translate the remaining entries
      },
-   };
+   } as const;
 
    export default frFR;
    ```
 
 3. **Register the new dictionary**
 
-   Open `i18n/utils.ts`, import the new dictionary, and register it in the `translations` object:
+   Open `i18n/index.ts`, import the new dictionary, and register it in the `messages` configuration of `createI18n`:
 
-   ```typescript title="i18n/utils.ts" ins={4,11}
-   import zhHans, { type Translation, type TranslationSchema } from "./messages/zh-Hans";
+   ```typescript title="i18n/index.ts" ins={4,13}
+   import zhHans from "./messages/zh-Hans";
    import enUS from "./messages/en-US";
    import jaJP from "./messages/ja-JP";
    import frFR from "./messages/fr-FR";
-   import type { Lang } from "./";
 
-   const translations: Record<Lang, TranslationSchema> = {
-     "zh-Hans": zhHans,
-     "en-US": enUS,
-     "ja-JP": jaJP,
-     "fr-FR": frFR,
-   };
+   export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
+     createI18n({
+       defaultLanguage: "zh-Hans",
+       messages: {
+         "zh-Hans": zhHans,
+         "en-US": enUS,
+         "ja-JP": jaJP,
+         "fr-FR": frFR,
+       },
+     });
    ```
 
 4. **Add author information for the new language**

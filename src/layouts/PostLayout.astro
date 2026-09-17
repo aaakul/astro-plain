@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getTranslation } from "~/i18n";
+import { getTranslations } from "~/i18n";
 import PostHeader from "@/components/blog/PostHeader.astro";
 import FormattedDate from "@/components/ui/FormattedDate.astro";
 import type { ReadTimeResults } from "reading-time";
@@ -38,7 +38,7 @@ const {
   enableComments,
 } = Astro.props;
 
-const t = await getTranslation(language, "common");
+const t = getTranslations(language, "common");
 
 // Only display Table of Contents if headings exist
 const showToc = headings && headings.length > 0;

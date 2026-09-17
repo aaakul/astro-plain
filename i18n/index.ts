@@ -1,5 +1,10 @@
+import { createI18n } from "@aaakul/ts-intl";
 import SiteConfig from "~/site.config";
 import { z } from "astro/zod";
+
+import enUS from "./messages/en-US";
+import jaJP from "./messages/ja-JP";
+import zhHans from "./messages/zh-Hans";
 
 // Validate language settings from site.config.ts
 const langCodeSchema = z.string().regex(/^[a-z]{2,3}(-[A-Za-z]{2,4})?$/);
@@ -41,21 +46,25 @@ try {
   }
 }
 
+export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
+  createI18n({
+    defaultLanguage: "zh-Hans",
+    messages: {
+      "zh-Hans": zhHans,
+      "en-US": enUS,
+      "ja-JP": jaJP,
+    },
+  });
+
+/** Supported language codes as union type */
+export type Language = (typeof languages)[number];
+export type Lang = Language;
+
 /** Map of language code to display name (e.g. { "en-US": "English", ... }) */
 export const LANG_NAME_MAP = SiteConfig.languageNameMap;
 
-/** Supported language codes as union type */
-export type Lang = keyof typeof SiteConfig.languageNameMap;
-
 /** Array of all supported language codes */
-export const AVAILABLE_LANG = Object.freeze(Object.keys(LANG_NAME_MAP) as Lang[]) as readonly [
-  Lang,
-  ...Lang[],
-];
+export const AVAILABLE_LANG = languages as readonly [Lang, ...Lang[]];
 
 /** Default fallback language */
-export const DEFAULT_LANG = AVAILABLE_LANG.includes(SiteConfig.defaultLanguage as Lang)
-  ? (SiteConfig.defaultLanguage as Lang)
-  : AVAILABLE_LANG[0];
-
-export { getTranslation } from "./utils";
+export const DEFAULT_LANG = defaultLanguage;

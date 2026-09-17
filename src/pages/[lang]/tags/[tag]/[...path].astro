@@ -1,5 +1,5 @@
 ---
-import { AVAILABLE_LANG, getTranslation } from "~/i18n";
+import { AVAILABLE_LANG, getTranslations } from "~/i18n";
 import RootLayout from "@/layouts/RootLayout.astro";
 import { getBlog, getBlogCoreContent, getStats, getTopics } from "~/lib/content-utils";
 import TwoColumnLayout from "@/layouts/TwoColumnLayout.astro";
@@ -46,7 +46,7 @@ export async function getStaticPaths() {
 const { lang, tag: currentTag } = Astro.params;
 const { posts, pagination, displayTag } = Astro.props;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 
 const { tagList, categoryList } = await getTopics(lang);
 ---

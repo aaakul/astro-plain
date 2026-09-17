@@ -1,5 +1,5 @@
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 import Icon from "@/components/ui/Icon.astro";
 
@@ -55,7 +55,7 @@ const pageButtons = getPageButtons();
 const prevPage = currentPage > 1 ? currentPage - 1 : null;
 const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 {

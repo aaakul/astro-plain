@@ -1,6 +1,6 @@
 ---
 // Sidebar panel widget displaying categories and tags cloud for the current language
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 import Topic from "./Topic.astro";
 import { slug } from "github-slugger";
 
@@ -14,7 +14,7 @@ type Props = {
 
 const { lang, categories, tags, currentCategory, currentTag } = Astro.props;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 <style>

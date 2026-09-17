@@ -12,7 +12,7 @@ A minimalist multilingual static blog template built on [Astro](https://astro.bu
 
 - **High-Performance Minimal Architecture**: Built on [Astro](https://astro.build/) Static Site Generation (SSG), with no CSS / UI framework dependencies. Achieves a perfect 100/100 Lighthouse score across all categories.
 - **Internationalization (i18n) & SEO**:
-  - Built-in Simplified Chinese, English, and Japanese translations.
+  - Built-in Simplified Chinese, English, and Japanese translations, powered by [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl).
   - Subpath-based static multilingual routing (e.g., `/zh-Hans/`, `/en-US/`, `/ja-JP/`).
   - Smart language redirect: automatically selects the site language based on language preference cookie or browser language.
   - Automatic generation of multilingual SEO tags (`hreflang` / `x-default` / Open Graph).
@@ -175,7 +175,7 @@ Body content...
 
 1. Add the language code to `languageNameMap` in `site.config.ts` (e.g., `"fr-FR": "Français"`).
 2. Create the corresponding translation dictionary file under `i18n/messages/` (e.g., `fr-FR.ts`).
-3. Import the file in `i18n/utils.ts`.
+3. Import and register the dictionary in `createI18n` in `i18n/index.ts`.
 4. Create an author file containing at least `default.mdx` under `src/content/author/<language-code>/`.
 
 ---

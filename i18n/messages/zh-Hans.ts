@@ -62,12 +62,4 @@ const zhHans = {
   },
 } as const;
 
-export type Translation = typeof zhHans;
-
-export type TranslationSchema = {
-  [K in keyof Translation]: {
-    [SubK in keyof Translation[K]]: string;
-  };
-};
-
 export default zhHans;

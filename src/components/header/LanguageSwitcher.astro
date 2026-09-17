@@ -1,12 +1,12 @@
 ---
-import { AVAILABLE_LANG, getTranslation, LANG_NAME_MAP, type Lang } from "~/i18n";
+import { AVAILABLE_LANG, getTranslations, LANG_NAME_MAP, type Lang } from "~/i18n";
 import { COOKIE_MAX_AGE } from "~/site.config";
 import Icon from "@/components/ui/Icon.astro";
 
 type Props = { lang: Lang; switchLinks: Map<Lang, string> };
 
 const { lang, switchLinks } = Astro.props;
-const t = await getTranslation(lang, "language_switcher");
+const t = getTranslations(lang, "language_switcher");
 
 // Only display languages that have valid switch destination links
 const validLanguages = AVAILABLE_LANG.filter((opt) => switchLinks.has(opt));

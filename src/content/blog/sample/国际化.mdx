@@ -3,7 +3,7 @@ title: "国际化指南"
 summary: "Astro Plain 的国际化（i18n）指南：翻译函数用法与新增语言的步骤。"
 translationKey: "i18n-guide"
 date: "2026-09-01T12:00:00Z"
-lastmod: "2026-09-01T12:00:00Z"
+lastmod: "2026-09-17T17:00:00Z"
 tags: ["Astro", "i18n", "国际化", "指南"]
 categories: ["示例"]
 language: "zh-Hans"
@@ -23,8 +23,8 @@ isCanonical: true
 <FileTree>
 
 - i18n/
-  - **index.ts** 语言类型与常量定义
-  - **utils.ts** 翻译工具函数
+  - **index.ts** 国际化核心配置
+  - **utils.ts** 兼容性工具导出
   - messages/ 各语言翻译字典
     - **zh-Hans.ts** 中文字典
     - **en-US.ts** 英文字典
@@ -44,15 +44,15 @@ isCanonical: true
 
 ## 翻译函数
 
-在 Astro 页面或组件中，通过 `getTranslation(lang, namespace?)` 获取翻译函数 `t`。
+本项目 i18n 翻译通过 [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl) 实现。
 
 ### 基础用法
 
-调用 `getTranslation` 并传入语言代码后，即可通过 `t("namespace.key")` 获取对应翻译：
+调用 `getTranslations` 并传入语言代码后，即可通过 `t("namespace.key")` 获取对应翻译：
 
-```astro {11} "t("common.home")"
+```astro {10} "t("common.home")"
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 
 interface Props {
   lang: Lang;
@@ -60,8 +60,7 @@ interface Props {
 
 const { lang } = Astro.props;
 
-// 获取翻译函数
-const t = await getTranslation(lang);
+const t = getTranslations(lang);
 ---
 
 <nav>
@@ -77,12 +76,12 @@ const t = await getTranslation(lang);
 
 ```astro title="src/components/Header.astro" {7} "tCommon("site_title")"
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 
 const { lang } = Astro.props;
 
 // 绑定 `common` 命名空间
-const tCommon = await getTranslation(lang, "common");
+const tCommon = getTranslations(lang, "common");
 ---
 
 <header>
@@ -95,7 +94,7 @@ const tCommon = await getTranslation(lang, "common");
 
 ```astro
 ---
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 {
@@ -106,11 +105,13 @@ const t = await getTranslation(lang, "common");
 <p>{t("link_to", { title: "Astro" })}</p>
 ```
 
+更多用法请参考[说明文档](https://github.com/aaakul/ts-intl#readme)
+
 ---
 
 ## 新增语言
 
-为站点添加一门新的语言（例如法语 `fr-FR`），只需以下 3 步：
+为站点添加一门新的语言（例如法语 `fr-FR`），只需以下 4 步：
 
 <Steps>
 
@@ -135,9 +136,7 @@ const t = await getTranslation(lang, "common");
    在 `i18n/messages/` 目录下创建新文件 `fr-FR.ts`。建议复制现有字典文件，并替换其中的翻译文本：
 
    ```typescript title="i18n/messages/fr-FR.ts"
-   import type { TranslationSchema } from "./zh-Hans";
-
-   const frFR: TranslationSchema = {
+   const frFR = {
      common: {
        home: "Accueil",
        about: "À propos",
@@ -145,28 +144,31 @@ const t = await getTranslation(lang, "common");
        page_num: "Page {num}",
        // ... 翻译其余词条
      },
-   };
+   } as const;
 
    export default frFR;
    ```
 
 3. **注册新字典**
 
-   打开 `i18n/utils.ts`，导入新建的字典并在 `translations` 对象中注册：
+   打开 `i18n/index.ts`，导入新建的字典并在 `createI18n` 的 `messages` 对象中注册：
 
-   ```typescript title="i18n/utils.ts" ins={4,11}
-   import zhHans, { type Translation, type TranslationSchema } from "./messages/zh-Hans";
+   ```typescript title="i18n/index.ts" ins={4,13}
+   import zhHans from "./messages/zh-Hans";
    import enUS from "./messages/en-US";
    import jaJP from "./messages/ja-JP";
    import frFR from "./messages/fr-FR";
-   import type { Lang } from "./";
 
-   const translations: Record<Lang, TranslationSchema> = {
-     "zh-Hans": zhHans,
-     "en-US": enUS,
-     "ja-JP": jaJP,
-     "fr-FR": frFR,
-   };
+   export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
+     createI18n({
+       defaultLanguage: "zh-Hans",
+       messages: {
+         "zh-Hans": zhHans,
+         "en-US": enUS,
+         "ja-JP": jaJP,
+         "fr-FR": frFR,
+       },
+     });
    ```
 
 4. **添加该语言的作者信息**

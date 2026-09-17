@@ -3,7 +3,7 @@ title: "Astro Plain Usage Guide"
 summary: "Astro Plain is a minimalist multilingual static blog template built on Astro, with no CSS / UI framework dependencies. This article includes an introduction to Astro Plain features, configuration instructions, content management, and deployment guides."
 translationKey: "intro"
 date: "2026-09-07T13:00:00Z"
-lastmod: "2026-09-07T13:00:00Z"
+lastmod: "2026-09-17T17:00:00Z"
 tags: ["Astro", "Frontend", "Blog", "Template", "Guide"]
 categories: ["Examples"]
 language: "en-US"
@@ -18,7 +18,7 @@ image: "@/assets/og.jpg"
 
 - **High-Performance Minimal Architecture**: Built on [Astro](https://astro.build/) Static Site Generation (SSG), with no CSS / UI framework dependencies. Achieves a [perfect 100/100 Lighthouse score](https://pagespeed.web.dev/analysis/https-astro-plain-demo-pages-dev-en-US-blog-sample-intro/koeoulhg15?form_factor=mobile) across all categories.
 - **Internationalization (i18n) & SEO**:
-  - Built-in Simplified Chinese, English, and Japanese translations.
+  - Built-in Simplified Chinese, English, and Japanese translations, powered by [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl).
   - Subpath-based static multilingual routing (e.g., `/zh-Hans/`, `/en-US/`, `/ja-JP/`).
   - Smart language redirect: automatically selects the site language based on language preference cookie or browser language.
   - Automatic generation of multilingual SEO tags (`hreflang` / `x-default` / Open Graph).
@@ -196,7 +196,7 @@ This project uses the `translationKey` field in Frontmatter to establish associa
 
 1. Add the new language code to `languageNameMap` in `site.config.ts` (e.g., `"fr-FR": "Français"`).
 2. Create the corresponding dictionary file in the `i18n/messages/` directory (e.g., `fr-FR.ts`).
-3. Import the translation file in `i18n/utils.ts`.
+3. Import and register the translation dictionary in `createI18n` in `i18n/index.ts`.
 4. Create a language directory under `src/content/author/<language-code>/` and add the author info file (at least `default.mdx`).
 
 </Steps>

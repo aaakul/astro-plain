@@ -3,7 +3,7 @@ title: "Astro Plain 使用ガイド"
 summary: "Astro Plain は Astro ベースのミニマルな多言語静的ブログテンプレートで、CSS / UI フレームワークに依存しません。この記事では、Astro Plain の機能紹介、設定説明、コンテンツ管理やデプロイ手順が含まれています。"
 translationKey: "intro"
 date: "2026-09-07T13:00:00Z"
-lastmod: "2026-09-07T13:00:00Z"
+lastmod: "2026-09-17T17:00:00Z"
 tags: ["Astro", "フロントエンド", "ブログ", "テンプレート", "ガイド"]
 categories: ["サンプル"]
 language: "ja-JP"
@@ -18,7 +18,7 @@ image: "@/assets/og.jpg"
 
 - **高性能ミニマルアーキテクチャ**：[Astro](https://astro.build/) の静的サイト生成（SSG）をベースとし、CSS / UI フレームワークに依存しません。[Lighthouse の全カテゴリで 100 点満点](https://pagespeed.web.dev/analysis/https-astro-plain-demo-pages-dev-en-US-blog-sample-intro/koeoulhg15?form_factor=mobile)を達成。
 - **国際化（i18n）と SEO**：
-  - 簡体字中国語、英語、日本語の翻訳を内蔵。
+  - 簡体字中国語、英語、日本語の翻訳を内蔵（[`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl) ベース）。
   - サブパスベースの静的多言語ルーティング（例：`/zh-Hans/`、`/en-US/`、`/ja-JP/`）。
   - スマート言語リダイレクト：言語設定 Cookie またはブラウザの言語設定に基づいて、サイトの言語を自動選択。
   - 多言語 SEO タグ（`hreflang` / `x-default` / Open Graph）の自動生成。
@@ -196,7 +196,7 @@ image: "@/assets/og.jpg"
 
 1. `site.config.ts` の `languageNameMap` に新しい言語コードを追加します（例：`"fr-FR": "Français"`）。
 2. `i18n/messages/` ディレクトリに対応する辞書ファイルを作成します（例：`fr-FR.ts`）。
-3. `i18n/utils.ts` で翻訳ファイルをインポートします。
+3. `i18n/index.ts` の `createI18n` に翻訳辞書をインポートして登録します。
 4. `src/content/author/<言語コード>/` ディレクトリを作成し、著者情報ファイル（最低限 `default.mdx`）を追加します。
 
 </Steps>

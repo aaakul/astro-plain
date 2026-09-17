@@ -1,5 +1,5 @@
 ---
-import { AVAILABLE_LANG, getTranslation } from "~/i18n";
+import { AVAILABLE_LANG, getTranslations } from "~/i18n";
 import AuthorLayout from "@/layouts/AuthorLayout.astro";
 import RootLayout from "@/layouts/RootLayout.astro";
 import { getCollection, render } from "astro:content";
@@ -29,7 +29,7 @@ const { name, avatar } = author.data;
 
 const { Content } = await render(author);
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 <RootLayout

@@ -3,7 +3,7 @@ import "@/styles/reset.css";
 import "@/styles/global.css";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/header/Header.astro";
-import { AVAILABLE_LANG, DEFAULT_LANG, getTranslation, type Lang } from "~/i18n";
+import { AVAILABLE_LANG, DEFAULT_LANG, getTranslations, type Lang } from "~/i18n";
 import ScrollTop from "@/components/ScrollTop.astro";
 import BaseHead from "@/components/BaseHead.astro";
 import SiteConfig, { SITE_URL_WITH_BASE } from "~/site.config";
@@ -49,7 +49,7 @@ const imageSrc =
 
 const ogImageUrl = imageSrc ? new URL(imageSrc, Astro.site ?? Astro.url).href : undefined;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 
 const siteTitle = t("site_title");
 const siteDescription = t("site_description");

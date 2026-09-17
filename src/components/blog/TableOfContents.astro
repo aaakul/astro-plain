@@ -2,7 +2,7 @@
 // Table of Contents navigation component built from markdown headings
 import type { MarkdownHeading } from "astro";
 import type { HTMLAttributes } from "astro/types";
-import { type Lang, getTranslation } from "~/i18n";
+import { type Lang, getTranslations } from "~/i18n";
 
 type Props = {
   toc: MarkdownHeading[];
@@ -11,7 +11,7 @@ type Props = {
 
 const { toc, lang, class: className, ...navAttributes } = Astro.props;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 ---
 
 {

@@ -1,5 +1,5 @@
 ---
-import { getTranslation } from "~/i18n";
+import { getTranslations } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 import Topic from "./Topic.astro";
 import { type Props as PostLayoutProps } from "@/layouts/PostLayout.astro";
@@ -15,7 +15,7 @@ type Props = Pick<
 
 const { date, title, summary, tags, categories, language, authors, readingTime } = Astro.props;
 
-const t = await getTranslation(language, "common");
+const t = getTranslations(language, "common");
 
 const authorMap = await Promise.all(
   authors.map(async (author: string) => {

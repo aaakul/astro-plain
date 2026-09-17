@@ -2,14 +2,14 @@
 import SiteConfig from "~/site.config";
 import HeaderLink from "./HeaderLink.astro";
 import HeaderButton from "./HeaderButton.astro";
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 
 type Props = { lang: Lang; switchLinks: Map<Lang, string> };
 
 const { lang, switchLinks } = Astro.props;
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 
 const defaultNavLinks = [
   { href: "", titleKey: "home" },

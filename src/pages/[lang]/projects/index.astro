@@ -4,7 +4,7 @@ import MDXLayout from "@/layouts/MDXLayout.astro";
 import RootLayout from "@/layouts/RootLayout.astro";
 import TwoColumnLayout from "@/layouts/TwoColumnLayout.astro";
 import { getCollection, render } from "astro:content";
-import { AVAILABLE_LANG, getTranslation } from "~/i18n";
+import { AVAILABLE_LANG, getTranslations } from "~/i18n";
 import { slug } from "github-slugger";
 import MobileTableOfContents from "@/components/blog/MobileTableOfContents.astro";
 import IconsWithLinks from "@/components/ui/IconsWithLinks.astro";
@@ -20,7 +20,7 @@ const { lang } = Astro.params;
 
 const projects = await getCollection("project", ({ data }) => data.language === lang);
 
-const t = await getTranslation(lang, "common");
+const t = getTranslations(lang, "common");
 
 // Generates unique anchor slugs for project headings (disambiguating duplicate names)
 const getProjectSlug = (name: string, index: number) => {

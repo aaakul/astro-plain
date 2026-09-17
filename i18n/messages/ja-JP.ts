@@ -1,5 +1,3 @@
-import type { TranslationSchema } from "./zh-Hans";
-
 const jaJP = {
   common: {
     about: "プロフィール",
@@ -62,6 +60,6 @@ const jaJP = {
     dark: "ダーク",
     light: "ライト",
   },
-} as const satisfies TranslationSchema;
+} as const;
 
 export default jaJP;

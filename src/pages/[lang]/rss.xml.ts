@@ -1,6 +1,6 @@
 import rss from "@astrojs/rss";
 import { SITE_URL_WITH_BASE } from "~/site.config";
-import { AVAILABLE_LANG, getTranslation, type Lang } from "~/i18n";
+import { AVAILABLE_LANG, getTranslations, type Lang } from "~/i18n";
 import type { APIRoute } from "astro";
 import { getBlog, getAuthorName } from "~/lib/content-utils";
 
@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 /** Generates localized RSS 2.0 feed with Dublin Core metadata */
 export const GET: APIRoute = async ({ params }) => {
   const lang = params.lang as Lang;
-  const t = await getTranslation(lang, "common");
+  const t = getTranslations(lang, "common");
 
   const posts = await getBlog(lang);
   const siteChannelUrl = `${SITE_URL_WITH_BASE}/${lang}/`;

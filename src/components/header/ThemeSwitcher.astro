@@ -1,11 +1,11 @@
 ---
-import { getTranslation, type Lang } from "~/i18n";
+import { getTranslations, type Lang } from "~/i18n";
 import Icon from "@/components/ui/Icon.astro";
 
 type Props = { lang: Lang };
 
 const { lang } = Astro.props;
-const t = await getTranslation(lang, "theme_switcher");
+const t = getTranslations(lang, "theme_switcher");
 
 const themeModeMap = {
   dark: t("dark"),

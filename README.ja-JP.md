@@ -12,7 +12,7 @@
 
 - **高性能ミニマルアーキテクチャ**：[Astro](https://astro.build/) の静的サイト生成（SSG）をベースとし、CSS / UI フレームワークに依存しません。Lighthouse の全カテゴリで 100 点満点を達成。
 - **国際化（i18n）と SEO**：
-  - 簡体字中国語、英語、日本語の翻訳を内蔵。
+  - 簡体字中国語、英語、日本語の翻訳を内蔵（[`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl) ベース）。
   - サブパスベースの静的多言語ルーティング（例：`/zh-Hans/`、`/en-US/`、`/ja-JP/`）。
   - スマート言語リダイレクト：言語設定 Cookie またはブラウザの言語設定に基づいて、サイトの言語を自動選択。
   - 多言語 SEO タグ（`hreflang` / `x-default` / Open Graph）の自動生成。
@@ -175,7 +175,7 @@ link:
 
 1. `site.config.ts` の `languageNameMap` に言語コードを追加します（例：`"fr-FR": "Français"`）。
 2. `i18n/messages/` 配下に対応する翻訳辞書ファイルを作成します（例：`fr-FR.ts`）。
-3. `i18n/utils.ts` でそのファイルをインポートします。
+3. `i18n/index.ts` の `createI18n` にその辞書をインポートして登録します。
 4. `src/content/author/<言語コード>/` 配下に最低限 `default.mdx` を含む著者ファイルを作成します。
 
 ---

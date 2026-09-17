@@ -2,7 +2,7 @@
 // Smart link component handling internal base path prefixing and external security attributes
 import type { HTMLAttributes } from "astro/types";
 import SiteConfig from "~/site.config";
-import { DEFAULT_LANG, getTranslation, type Lang } from "~/i18n";
+import { DEFAULT_LANG, getTranslations, type Lang } from "~/i18n";
 
 export type Props = { href: string } & Omit<HTMLAttributes<"a">, "href" | "lang"> & {
     showIcon?: boolean;
@@ -25,7 +25,7 @@ if (isExternalLink) {
 }
 
 const currentLang = (lang || Astro.params.lang || DEFAULT_LANG) as Lang;
-const t = isExternalLink ? await getTranslation(currentLang, "common") : null;
+const t = isExternalLink ? getTranslations(currentLang, "common") : null;
 ---
 
 <a
