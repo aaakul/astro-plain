@@ -1,5 +1,5 @@
 ---
-import { getTranslations } from "~/i18n";
+import { useTranslations, useLocale } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 import Topic from "./Topic.astro";
 import { type Props as PostLayoutProps } from "@/layouts/PostLayout.astro";
@@ -13,9 +13,19 @@ type Props = Pick<
   "title" | "summary" | "date" | "tags" | "categories" | "language" | "authors" | "readingTime"
 >;
 
-const { date, title, summary, tags, categories, language, authors, readingTime } = Astro.props;
+const {
+  date,
+  title,
+  summary,
+  tags,
+  categories,
+  language: propLang,
+  authors,
+  readingTime,
+} = Astro.props;
+const language = propLang || useLocale();
 
-const t = getTranslations(language, "common");
+const t = useTranslations("common");
 
 const authorMap = await Promise.all(
   authors.map(async (author: string) => {
@@ -80,7 +90,7 @@ const authorMap = await Promise.all(
   <div id="details" data-pagefind-ignore>
     {/* Published Date */}
     <div class="container">
-      <FormattedDate lang={language} date={date} />
+      <FormattedDate date={date} />
 
       {/* Reading Time */}
       <div id="reading-time">
@@ -115,12 +125,7 @@ const authorMap = await Promise.all(
           {categories && (
             <div class="wrapper">
               {categories.map((category: string) => (
-                <Topic
-                  lang={language}
-                  text={category}
-                  type="categories"
-                  data-pagefind-filter={t("category")}
-                />
+                <Topic text={category} type="categories" data-pagefind-filter={t("category")} />
               ))}
             </div>
           )}
@@ -130,7 +135,7 @@ const authorMap = await Promise.all(
           {tags && (
             <div class="wrapper">
               {tags.map((tag: string) => (
-                <Topic text={tag} lang={language} data-pagefind-filter={t("tag")} />
+                <Topic text={tag} data-pagefind-filter={t("tag")} />
               ))}
             </div>
           )}

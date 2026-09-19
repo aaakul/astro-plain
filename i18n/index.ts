@@ -1,4 +1,4 @@
-import { createI18n } from "@aaakul/ts-intl";
+import { createAstroI18n } from "ts-intl-astro";
 import SiteConfig from "~/site.config";
 import { z } from "astro/zod";
 
@@ -46,15 +46,23 @@ try {
   }
 }
 
-export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
-  createI18n({
-    defaultLanguage: "zh-Hans",
-    messages: {
-      "zh-Hans": zhHans,
-      "en-US": enUS,
-      "ja-JP": jaJP,
-    },
-  });
+export const {
+  useTranslations,
+  useLocale,
+  useFormatter,
+  getTranslations,
+  getFormatter,
+  isSupportedLanguage,
+  languages,
+  defaultLanguage,
+} = createAstroI18n({
+  defaultLanguage: "zh-Hans",
+  messages: {
+    "zh-Hans": zhHans,
+    "en-US": enUS,
+    "ja-JP": jaJP,
+  },
+});
 
 /** Supported language codes as union type */
 export type Language = (typeof languages)[number];

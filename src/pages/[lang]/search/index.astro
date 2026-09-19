@@ -1,7 +1,7 @@
 ---
 import Topic from "@/components/blog/Topic.astro";
 import RootLayout from "@/layouts/RootLayout.astro";
-import { AVAILABLE_LANG, getTranslations } from "~/i18n";
+import { AVAILABLE_LANG, useTranslations } from "~/i18n";
 import { getStats } from "~/lib/content-utils";
 import Search from "@/components/Search.astro";
 
@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 
 const { lang } = Astro.params;
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 
 // Retrieve tag and category frequency statistics for quick filter links
 const tagStats = await getStats(lang, "tags");
@@ -23,11 +23,11 @@ const categoryStats = await getStats(lang, "categories");
 const categoryText = !categoryStats ? null : Object.keys(categoryStats);
 ---
 
-<RootLayout lang={lang}>
+<RootLayout>
   <main slot="content">
     <h1 class="sr-only">{t("search")}</h1>
 
-    <Search lang={lang} id="search" />
+    <Search id="search" />
 
     {
       categoryStats && (
@@ -36,7 +36,7 @@ const categoryText = !categoryStats ? null : Object.keys(categoryStats);
           <ul class="topics-container">
             {categoryText!.map((category) => (
               <li class="topic-item">
-                <Topic text={category} lang={lang} type="categories" />
+                <Topic text={category} type="categories" />
                 <span class="count">({categoryStats[category as keyof typeof categoryStats]})</span>
               </li>
             ))}
@@ -54,7 +54,7 @@ const categoryText = !categoryStats ? null : Object.keys(categoryStats);
           <ul class="topics-container">
             {tagText!.map((tag) => (
               <li class="topic-item">
-                <Topic text={tag} lang={lang} />
+                <Topic text={tag} />
                 <span class="count">({tagStats[tag as keyof typeof tagStats]})</span>
               </li>
             ))}

@@ -1,5 +1,5 @@
 ---
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations, useLocale } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 import type { HTMLAttributes } from "astro/types";
 
@@ -12,11 +12,11 @@ export type LinkItem = {
 type Props = {
   links: LinkItem[];
   class?: string;
-  lang: Lang;
 };
 
-const { links, class: className, lang } = Astro.props;
-const t = getTranslations(lang, "common");
+const { links, class: className } = Astro.props;
+const lang = useLocale();
+const t = useTranslations("common");
 
 // Strip trailing slash for consistent pathname matching
 const currentPath = Astro.url.pathname;
@@ -35,7 +35,6 @@ const normalize = (p: string) => p.replace(/\/$/, "") || "/";
     return (
       <Link
         href={fullHref}
-        lang={lang}
         class:list={[className, itemClass]}
         title={title}
         aria-label={customAriaLabel || t("link_to", { title })}

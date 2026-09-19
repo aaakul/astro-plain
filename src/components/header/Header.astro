@@ -2,14 +2,15 @@
 import SiteConfig from "~/site.config";
 import HeaderLink from "./HeaderLink.astro";
 import HeaderButton from "./HeaderButton.astro";
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations, useLocale, type Lang } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 
-type Props = { lang: Lang; switchLinks: Map<Lang, string> };
+type Props = { switchLinks: Map<Lang, string> };
 
-const { lang, switchLinks } = Astro.props;
+const { switchLinks } = Astro.props;
+const lang = useLocale();
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 
 const defaultNavLinks = [
   { href: "", titleKey: "home" },
@@ -53,11 +54,11 @@ const links = navConfig.map((item) => {
     </div>
 
     <div id="nav-center" class="hidden fadeIn">
-      <HeaderLink lang={lang} links={links} />
+      <HeaderLink links={links} />
     </div>
 
     <div id="nav-end">
-      <HeaderButton lang={lang} switchLinks={switchLinks} />
+      <HeaderButton switchLinks={switchLinks} />
     </div>
   </div>
 </nav>

@@ -2,12 +2,9 @@
 // withastro/starlight
 // MDX component that renders an interactive, styled file system directory tree
 import { processFileTree } from "~/lib/starlight/rehype-file-tree";
-import { DEFAULT_LANG, getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 
-type Props = { lang?: Lang };
-
-const currentLang = (Astro.props.lang || Astro.params.lang || DEFAULT_LANG) as Lang;
-const t = getTranslations(currentLang, "common");
+const t = useTranslations("common");
 
 // Render slot markdown list into HTML and process with rehype file tree parser
 const fileTreeHtml = await Astro.slots.render("default");

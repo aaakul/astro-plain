@@ -1,9 +1,9 @@
 ---
 title: "国际化指南"
-summary: "Astro Plain 的国际化（i18n）指南：翻译函数用法与新增语言的步骤。"
+summary: "Astro Plain 的国际化（i18n）指南：翻译函数用法、配置规范与新增语言步骤。"
 translationKey: "i18n-guide"
 date: "2026-09-01T12:00:00Z"
-lastmod: "2026-09-17T17:00:00Z"
+lastmod: "2026-09-19T22:35:00Z"
 tags: ["Astro", "i18n", "国际化", "指南"]
 categories: ["示例"]
 language: "zh-Hans"
@@ -13,8 +13,9 @@ isCanonical: true
 
 ## 特性概览
 
-- **智能重定向**：根据 Cookie 或浏览器语言偏好自动跳转至对应语言首页。
-- **多语言文章关联**：无需增加子文件夹，通过 `translationKey` 自动关联多语言文章并生成相关 SEO 标签
+- **智能重定向**：根据 Cookie 或浏览器首选语言自动跳转至对应语言首页。
+- **无感上下文注入**：基于 `ts-intl-astro`，组件内无需手动透传 `lang` 参数，直接调用 `useTranslations` 或 `useLocale`。
+- **多语言文章关联**：无需嵌套子目录，通过 Frontmatter 的 `translationKey` 自动关联各语言版本并生成对应 SEO 规范标签（`canonical` / `hreflang`）。
 
 ---
 
@@ -23,101 +24,114 @@ isCanonical: true
 <FileTree>
 
 - i18n/
-  - **index.ts** 国际化核心配置
-  - **utils.ts** 兼容性工具导出
+  - **index.ts** 国际化核心初始化与方法导出
   - messages/ 各语言翻译字典
     - **zh-Hans.ts** 中文字典
     - **en-US.ts** 英文字典
     - **ja-JP.ts** 日文字典
 - src/content/
   - **blog/** 博客文章（通过 `translationKey` 关联）
-  - **author/** 作者信息（按语言划分文件夹）
-  - **project/** 项目介绍（按语言划分文件夹）
-  - **mdx/** 其他 MDX 内容（按语言划分文件夹）
+  - **author/** 作者信息（按语言分目录）
+  - **project/** 项目介绍（按语言分目录）
+  - **mdx/** 其他 MDX 内容（按语言分目录）
     - **[lang]/**
       - **hero.mdx** 首屏区域（Hero Section）
-- **site.config.ts** 站点核心参数配置文件
+- **astro.config.mjs** 集成配置（注册 `tsIntl()`）
+- **site.config.ts** 站点核心参数配置
 
 </FileTree>
 
 ---
 
-## 翻译函数
+## 翻译函数用法
 
-本项目 i18n 翻译通过 [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl) 实现。
+本项目国际化基于 [`ts-intl-astro`](https://github.com/aaakul/ts-intl) 实现，在 Astro 组件树中自动注入当前语言上下文。
 
-### 基础用法
+### 基础用法（绑定命名空间）
 
-调用 `getTranslations` 并传入语言代码后，即可通过 `t("namespace.key")` 获取对应翻译：
+推荐在组件中绑定所需的命名空间，调用 `t` 时直接传入词条键名：
 
-```astro {10} "t("common.home")"
+```astro title="src/components/Header.astro"
 ---
-import { getTranslations, type Lang } from "~/i18n";
-
-interface Props {
-  lang: Lang;
-}
-
-const { lang } = Astro.props;
-
-const t = getTranslations(lang);
----
-
-<nav>
-  {/* 直接通过 "命名空间.键名" 读取文本 */}
-  <a href={`/${lang}`}>{t("common.home")}</a>
-  <a href={`/${lang}/about`}>{t("common.about")}</a>
-</nav>
-```
-
-### 绑定命名空间（推荐）
-
-如果一个组件内主要使用某个命名空间下的词条，可以在初始化时指定命名空间，调用时直接传入键名：
-
-```astro title="src/components/Header.astro" {7} "tCommon("site_title")"
----
-import { getTranslations, type Lang } from "~/i18n";
-
-const { lang } = Astro.props;
+import { useTranslations } from "~/i18n";
 
 // 绑定 `common` 命名空间
-const tCommon = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <header>
-  <h1>{tCommon("site_title")}</h1>
-  <button>{tCommon("search")}</button>
+  <h1>{t("header_title")}</h1>
+  <a href="/">{t("home")}</a>
 </header>
+```
+
+### 全局命名空间访问
+
+若不传入命名空间参数，可通过 `namespace.key` 访问任意命名空间下的词条：
+
+```astro
+---
+import { useTranslations } from "~/i18n";
+
+const t = useTranslations();
+---
+
+<p>{t("common.home")}</p>
+<p>{t("search.placeholder")}</p>
+```
+
+### 获取当前语言代码
+
+在需要拼接本地化路由或传递给外部组件时，使用 `useLocale()` 获取当前页面的语言代码：
+
+```astro
+---
+import { useLocale } from "~/i18n";
+
+const lang = useLocale();
+---
+
+<a href={`/${lang}/about`}>关于</a>
 ```
 
 ### 参数插值
 
+词条中支持使用 `{param}` 占位符，调用时通过对象传入变量值：
+
 ```astro
 ---
-const t = getTranslations(lang, "common");
+import { useTranslations } from "~/i18n";
+
+const t = useTranslations("common");
+// 字典定义：link_to: "链接到{title}"
 ---
 
-{
-  /* const zhHans = {
-  common: { link_to: "链接到{title}" } */
-}
-{/* 自动替换占位符，输出 "链接到 Astro" */}
 <p>{t("link_to", { title: "Astro" })}</p>
+{/* 输出：链接到 Astro */}
 ```
 
-更多用法请参考[说明文档](https://github.com/aaakul/ts-intl#readme)
+### 非组件环境调用
+
+在 API 路由（如 `rss.xml.ts`）或静态路径生成（`getStaticPaths`）等无 Astro 渲染上下文的环境中，使用 `getTranslations` 显式传入语言代码：
+
+```typescript
+import { getTranslations } from "~/i18n";
+
+const t = getTranslations("zh-Hans", "common");
+const siteTitle = t("site_title");
+```
 
 ---
 
 ## 新增语言
 
-为站点添加一门新的语言（例如法语 `fr-FR`），只需以下 4 步：
+为站点添加一门新语言（例如法语 `fr-FR`），只需以下 4 步：
 
 <Steps>
 
-1. **在站点配置中添加语言代码**
+1. **在站点配置中添加语言映射**
 
-   打开 `site.config.ts`，在 `languageNameMap` 中加入新语言代码与显示名称：
+   在 `site.config.ts` 的 `languageNameMap` 中加入新语言代码与显示名称：
 
    ```typescript title="site.config.ts" ins={7}
    const SiteConfig = {
@@ -131,9 +145,9 @@ const t = getTranslations(lang, "common");
    };
    ```
 
-2. **创建语言字典文件**
+2. **创建翻译字典文件**
 
-   在 `i18n/messages/` 目录下创建新文件 `fr-FR.ts`。建议复制现有字典文件，并替换其中的翻译文本：
+   在 `i18n/messages/` 目录下新建 `fr-FR.ts`。建议参考现有字典补全词条：
 
    ```typescript title="i18n/messages/fr-FR.ts"
    const frFR = {
@@ -142,7 +156,7 @@ const t = getTranslations(lang, "common");
        about: "À propos",
        link_to: "Lien vers {title}",
        page_num: "Page {num}",
-       // ... 翻译其余词条
+       // ... 其他词条
      },
    } as const;
 
@@ -151,37 +165,36 @@ const t = getTranslations(lang, "common");
 
 3. **注册新字典**
 
-   打开 `i18n/index.ts`，导入新建的字典并在 `createI18n` 的 `messages` 对象中注册：
+   在 `i18n/index.ts` 中导入并注册到 `createAstroI18n`：
 
-   ```typescript title="i18n/index.ts" ins={4,13}
+   ```typescript title="i18n/index.ts" ins={4,16}
    import zhHans from "./messages/zh-Hans";
    import enUS from "./messages/en-US";
    import jaJP from "./messages/ja-JP";
    import frFR from "./messages/fr-FR";
 
-   export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
-     createI18n({
-       defaultLanguage: "zh-Hans",
-       messages: {
-         "zh-Hans": zhHans,
-         "en-US": enUS,
-         "ja-JP": jaJP,
-         "fr-FR": frFR,
-       },
-     });
+   export const {
+     useTranslations,
+     useLocale,
+     useFormatter,
+     getTranslations,
+     // ...
+   } = createAstroI18n({
+     defaultLanguage: "zh-Hans",
+     messages: {
+       "zh-Hans": zhHans,
+       "en-US": enUS,
+       "ja-JP": jaJP,
+       "fr-FR": frFR,
+     },
+   });
    ```
 
-4. **添加该语言的作者信息**
+4. **添加对应的作者信息与首屏内容**
 
-   在 `src/content/author/` 下新建对应语言目录（如 `src/content/author/fr-FR/default.mdx`）：
-
-   ```yaml
-   ---
-   name: "Luka"
-   language: "fr-FR"
-   occupation: "Développeur Full Stack"
-   ---
-   ```
+   在 `src/content/author/` 与 `src/content/mdx/` 下创建新语言目录及文件：
+   - `src/content/author/fr-FR/default.mdx`
+   - `src/content/mdx/fr-FR/hero.mdx`
 
 </Steps>
 
@@ -189,7 +202,7 @@ const t = getTranslations(lang, "common");
 
 ## 撰写多语言文章
 
-发布多语言文章时，可以直接在 `src/content/blog/` 中创建 Markdown / MDX 文件。项目根据 Frontmatter 中的 translationKey 自动关联不同语言版本：
+多语言文章均存放在 `src/content/blog/` 下，无需按语言分文件夹。系统依据 Frontmatter 的 `translationKey` 自动关联不同语言版本：
 
 <Tabs syncKey="blog-example">
   <TabItem label="中文版本 (介绍.mdx)">
@@ -226,5 +239,5 @@ Post content in English...
 
 > [!NOTE]
 >
-> - **`translationKey`**：同一篇文章的不同语言版本必须使用完全一致的 `translationKey`。
-> - **`isCanonical`**：建议在默认语言版本设为 `true` ，以生成正确的多语言权威链接（`x-default` 与 `canonical`）。
+> - **`translationKey`**：同一文章的不同语言版本需保持该值完全一致。
+> - **`isCanonical`**：建议在默认语言（如中文版）中设置为 `true`，以供生成多语言权威链接（`canonical` 与 `x-default`）。

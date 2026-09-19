@@ -3,7 +3,7 @@ import "@/styles/reset.css";
 import "@/styles/global.css";
 import Footer from "@/components/Footer.astro";
 import Header from "@/components/header/Header.astro";
-import { AVAILABLE_LANG, DEFAULT_LANG, getTranslations, type Lang } from "~/i18n";
+import { AVAILABLE_LANG, DEFAULT_LANG, useTranslations, useLocale, type Lang } from "~/i18n";
 import ScrollTop from "@/components/ScrollTop.astro";
 import BaseHead from "@/components/BaseHead.astro";
 import SiteConfig, { SITE_URL_WITH_BASE } from "~/site.config";
@@ -12,7 +12,7 @@ import LoadingIndicator from "astro-loading-indicator/component";
 import type { ImageMetadata } from "astro";
 
 type Props = {
-  lang: Lang;
+  lang?: Lang;
   title?: string;
   description?: string;
   image?: string | ImageMetadata;
@@ -27,8 +27,10 @@ type Props = {
   username?: string;
 };
 
+const currentLocale = useLocale() as Lang;
+
 const {
-  lang,
+  lang = currentLocale,
   title: headTitle,
   description: headDescription,
   image,
@@ -49,7 +51,7 @@ const imageSrc =
 
 const ogImageUrl = imageSrc ? new URL(imageSrc, Astro.site ?? Astro.url).href : undefined;
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 
 const siteTitle = t("site_title");
 const siteDescription = t("site_description");
@@ -196,8 +198,8 @@ const switchLinks: Map<Lang, string> =
     {!noindex && xDefaultURL && <link rel="alternate" href={xDefaultURL} hreflang="x-default" />}
   </head>
   <body>
-    <ScrollTop lang={lang} />
-    <Header lang={lang} switchLinks={switchLinks} />
+    <ScrollTop />
+    <Header switchLinks={switchLinks} />
     <style>
       body {
         display: flex;
@@ -234,6 +236,6 @@ const switchLinks: Map<Lang, string> =
       <slot name="content" />
       <slot name="footer" />
     </div>
-    <Footer lang={lang} />
+    <Footer />
   </body>
 </html>

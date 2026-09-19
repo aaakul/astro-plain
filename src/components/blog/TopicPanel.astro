@@ -1,20 +1,19 @@
 ---
 // Sidebar panel widget displaying categories and tags cloud for the current language
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import Topic from "./Topic.astro";
 import { slug } from "github-slugger";
 
 type Props = {
-  lang: Lang;
   categories: string[] | null;
   tags: string[] | null;
   currentCategory?: string;
   currentTag?: string;
 };
 
-const { lang, categories, tags, currentCategory, currentTag } = Astro.props;
+const { categories, tags, currentCategory, currentTag } = Astro.props;
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <style>
@@ -51,7 +50,6 @@ const t = getTranslations(lang, "common");
           {categories.map((category) => (
             <Topic
               text={category}
-              lang={lang}
               type="categories"
               aria-current={slug(category) === currentCategory ? "true" : undefined}
             />
@@ -70,7 +68,7 @@ const t = getTranslations(lang, "common");
 
       <div class="wrapper">
         {tags!.map((tag) => (
-          <Topic text={tag} lang={lang} aria-current={slug(tag) === currentTag ? "true" : null} />
+          <Topic text={tag} aria-current={slug(tag) === currentTag ? "true" : null} />
         ))}
       </div>
     </div>

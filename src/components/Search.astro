@@ -1,13 +1,13 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import SiteConfig from "~/site.config";
 
-type Props = { lang?: Lang } & HTMLAttributes<"div">;
+type Props = HTMLAttributes<"div">;
 
-const { lang = "zh-Hans", ...props } = Astro.props;
+const { ...props } = Astro.props;
 
-const t = getTranslations(lang, "search");
+const t = useTranslations("search");
 
 const translations = {
   placeholder: t("placeholder"),

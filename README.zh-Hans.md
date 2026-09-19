@@ -12,7 +12,7 @@
 
 - **高性能最小化架构**：基于 [Astro](https://astro.build/) 静态站点生成（SSG），无 CSS / UI 框架依赖。在 Lighthouse 各项指标评测中均获得 100 满分。
 - **国际化（i18n）与 SEO**：
-  - 内置简体中文，英文和日文翻译，基于 [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl)。
+  - 内置简体中文，英文和日文翻译，基于 [`ts-intl-astro`](https://github.com/aaakul/ts-intl)。
   - 基于子路径的静态多语言路由（如 `/zh-Hans/`、`/en-US/`、`/ja-JP/`）。
   - 智能语言跳转：根据语言偏好 Cookie 或浏览器语言自动选择网站语言。
   - 自动生成多语言 SEO 标签（`hreflang` / `x-default` / Open Graph）。

@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { getTranslations } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import PostHeader from "@/components/blog/PostHeader.astro";
 import FormattedDate from "@/components/ui/FormattedDate.astro";
 import type { ReadTimeResults } from "reading-time";
@@ -38,7 +38,7 @@ const {
   enableComments,
 } = Astro.props;
 
-const t = getTranslations(language, "common");
+const t = useTranslations("common");
 
 // Only display Table of Contents if headings exist
 const showToc = headings && headings.length > 0;
@@ -110,7 +110,7 @@ const { prev, next } = await getPrevNextPosts(id, language);
         <footer slot="footer">
           <span id="lastmod-date">
             {t("last_modified")}
-            <FormattedDate lang={language} date={lastmod} />
+            <FormattedDate date={lastmod} />
           </span>
         </footer>
       )
@@ -119,7 +119,6 @@ const { prev, next } = await getPrevNextPosts(id, language);
     {
       showToc && (
         <TableOfContents
-          lang={language}
           toc={headings.filter(
             (item: MarkdownHeading) => item.depth === 1 || item.depth === 2 || item.depth === 3,
           )}
@@ -129,11 +128,11 @@ const { prev, next } = await getPrevNextPosts(id, language);
     }
   </TwoColumnLayout>
 
-  {showToc && <MobileTableOfContents lang={language} />}
+  {showToc && <MobileTableOfContents />}
 </article>
 
-<RelatedPosts posts={relatedPosts} lang={language} />
+<RelatedPosts posts={relatedPosts} />
 
-<PostNav prev={prev} next={next} lang={language} />
+<PostNav prev={prev} next={next} />
 
 {enableComments && enableDisqus && disqusShortname && <Disqus />}

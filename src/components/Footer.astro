@@ -1,12 +1,9 @@
 ---
 import Link from "@/components/ui/Link.astro";
-import { getTranslations, type Lang } from "~/i18n";
-
-type Props = { lang: Lang };
-const { lang } = Astro.props;
+import { useTranslations } from "~/i18n";
 
 const currentYear = new Date().getFullYear();
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 const siteTitle = t("site_title");
 ---
 

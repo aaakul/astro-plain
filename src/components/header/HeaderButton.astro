@@ -4,9 +4,9 @@ import LanguageSwitcher from "./LanguageSwitcher.astro";
 import ThemeSwitcher from "./ThemeSwitcher.astro";
 import MobileNavMenu from "./MobileNavMenu.astro";
 
-type Props = { lang: Lang; switchLinks: Map<Lang, string> };
+type Props = { switchLinks: Map<Lang, string> };
 
-const { lang, switchLinks } = Astro.props;
+const { switchLinks } = Astro.props;
 ---
 
 <style is:global>
@@ -92,6 +92,6 @@ const { lang, switchLinks } = Astro.props;
     }
   }
 </style>
-<ThemeSwitcher lang={lang} />
-{AVAILABLE_LANG.length > 1 && <LanguageSwitcher lang={lang} switchLinks={switchLinks} />}
-<MobileNavMenu lang={lang} />
+<ThemeSwitcher />
+{AVAILABLE_LANG.length > 1 && <LanguageSwitcher switchLinks={switchLinks} />}
+<MobileNavMenu />

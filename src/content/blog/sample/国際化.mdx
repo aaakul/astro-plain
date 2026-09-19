@@ -1,9 +1,9 @@
 ---
 title: "国際化ガイド"
-summary: "Astro Plain の国際化（i18n）ガイド：翻訳関数の使い方と新しい言語の追加手順。"
+summary: "Astro Plain の国際化（i18n）ガイド：翻訳関数の使い方、設定仕様、新しい言語の追加手順。"
 translationKey: "i18n-guide"
 date: "2026-09-01T12:00:00Z"
-lastmod: "2026-09-17T17:00:00Z"
+lastmod: "2026-09-19T22:35:00Z"
 tags: ["Astro", "i18n", "国際化", "ガイド"]
 categories: ["サンプル"]
 language: "ja-JP"
@@ -17,17 +17,17 @@ isCanonical: false
 ## 機能概要
 
 - **スマートリダイレクト**：Cookie またはブラウザの言語設定に基づいて、対応する言語のトップページへ自動的にリダイレクトします。
-- **多言語記事のリンク**：サブフォルダ構造を追加することなく、`translationKey` を通じて多言語記事を自動的に関連付け、関連する SEO タグを生成します。
+- **Props 不要のコンテキスト注入**：`ts-intl-astro` を採用し、Astro コンポーネント間で `lang` をバケツリレーすることなく、直接 `useTranslations` や `useLocale` を利用できます。
+- **多言語記事の自動リンク**：サブディレクトリを作成することなく、Frontmatter の `translationKey` で各言語の記事を関連付け、適切な SEO タグ（`canonical` / `hreflang`）を自動生成します。
 
 ---
 
-## ファイル構造
+## ファイル構成
 
 <FileTree>
 
 - i18n/
-  - **index.ts** 国際化コア設定
-  - **utils.ts** 互換性ユーティリティのエクスポート
+  - **index.ts** 国際化の初期化とエクスポート
   - messages/ 各言語の翻訳辞書
     - **zh-Hans.ts** 中国語辞書
     - **en-US.ts** 英語辞書
@@ -39,88 +39,102 @@ isCanonical: false
   - **mdx/** その他の MDX コンテンツ（言語ごとにフォルダ分け）
     - **[lang]/**
       - **hero.mdx** ヒーローセクション
-- **site.config.ts** サイトのコア設定ファイル
+- **astro.config.mjs** Astro 設定（`tsIntl()` 統合を登録）
+- **site.config.ts** サイト共通設定
 
 </FileTree>
 
 ---
 
-## 翻訳関数
+## 翻訳関数の使い方
 
-本プロジェクトの i18n 翻訳は [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl) により実装されています。
+本プロジェクトの国際化は [`ts-intl-astro`](https://github.com/aaakul/ts-intl) を採用しており、Astro コンポーネントツリーに現在のロケールコンテキストを自動注入します。
 
-### 基本的な使い方
+### 基本的な使い方（名前空間のバインド）
 
-言語コードを渡して `getTranslations` を呼び出した後、`t("namespace.key")` で対応する翻訳を取得できます：
+コンポーネントで名前空間を指定して初期化すると、キー名を指定するだけで翻訳を取得できます：
 
-```astro {10} "t("common.home")"
+```astro title="src/components/Header.astro"
 ---
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 
-interface Props {
-  lang: Lang;
-}
-
-const { lang } = Astro.props;
-
-const t = getTranslations(lang);
----
-
-<nav>
-  {/* "名前空間.キー名" でテキストを直接取得 */}
-  <a href={`/${lang}`}>{t("common.home")}</a>
-  <a href={`/${lang}/about`}>{t("common.about")}</a>
-</nav>
-```
-
-### 名前空間のバインド（推奨）
-
-コンポーネント内で特定の名前空間のキーを主に使用する場合は、初期化時に名前空間を指定することで、呼び出し時にキー名だけを渡すことができます：
-
-```astro title="src/components/Header.astro" {7} "tCommon("site_title")"
----
-import { getTranslations, type Lang } from "~/i18n";
-
-const { lang } = Astro.props;
-
-// `common` 名前空間をバインドする
-const tCommon = getTranslations(lang, "common");
+// `common` 名前空間をバインド
+const t = useTranslations("common");
 ---
 
 <header>
-  <h1>{tCommon("site_title")}</h1>
-  <button>{tCommon("search")}</button>
+  <h1>{t("header_title")}</h1>
+  <a href="/">{t("home")}</a>
 </header>
+```
+
+### グローバル名前空間アクセス
+
+引数なしで `useTranslations` を呼び出すと、ドット記法（`namespace.key`）で任意のエントリを取得できます：
+
+```astro
+---
+import { useTranslations } from "~/i18n";
+
+const t = useTranslations();
+---
+
+<p>{t("common.home")}</p>
+<p>{t("search.placeholder")}</p>
+```
+
+### 現在の言語コードの取得
+
+多言語 URL の組み立てや外部コンポーネントへの受け渡しには、`useLocale()` を使用します：
+
+```astro
+---
+import { useLocale } from "~/i18n";
+
+const lang = useLocale();
+---
+
+<a href={`/${lang}/about`}>概要</a>
 ```
 
 ### パラメータの補間
 
+辞書内の `{param}` プレースホルダーに対応する値をオブジェクトで渡します：
+
 ```astro
 ---
-const t = getTranslations(lang, "common");
+import { useTranslations } from "~/i18n";
+
+const t = useTranslations("common");
+// 辞書定義: link_to: "{title}へのリンク"
 ---
 
-{
-  /* const jaJP = {
-  common: { link_to: "{title}へのリンク" } */
-}
-{/* プレースホルダーを自動的に置換し、"Astroへのリンク" と出力する */}
 <p>{t("link_to", { title: "Astro" })}</p>
+{/* 出力: Astroへのリンク */}
 ```
 
-詳しい使い方は[ドキュメント](https://github.com/aaakul/ts-intl#readme)を参照してください。
+### コンポーネント外での呼び出し
+
+API エンドポイント（`rss.xml.ts`）や静的パス生成（`getStaticPaths`）など、Astro コンテキストが存在しない環境では、言語コードを明示的に指定する `getTranslations` を使用します：
+
+```typescript
+import { getTranslations } from "~/i18n";
+
+const t = getTranslations("ja-JP", "common");
+const siteTitle = t("site_title");
+```
 
 ---
 
 ## 新しい言語の追加
 
-サイトに新しい言語（例：フランス語 `fr-FR`）を追加するには、以下の 4 ステップだけで完了します：
+サイトに新しい言語（例：フランス語 `fr-FR`）を追加する手順は以下の 4 ステップです：
 
 <Steps>
 
-1. **サイト設定に言語コードを追加する**
+1. **サイト設定に言語マッピングを追加**
 
-   `site.config.ts` を開き、`languageNameMap` に新しい言語コードと表示名を追加します：
+   `site.config.ts` の `languageNameMap` に新しい言語コードと表示名を追加します：
 
    ```typescript title="site.config.ts" ins={7}
    const SiteConfig = {
@@ -134,9 +148,9 @@ const t = getTranslations(lang, "common");
    };
    ```
 
-2. **言語辞書ファイルを作成する**
+2. **翻訳辞書ファイルを作成**
 
-   `i18n/messages/` ディレクトリに新しいファイル `fr-FR.ts` を作成します。既存の辞書ファイルをコピーして翻訳テキストを書き換えることを推奨します：
+   `i18n/messages/` 配下に `fr-FR.ts` を新規作成します。既存のファイルを複製して書き換えることを推奨します：
 
    ```typescript title="i18n/messages/fr-FR.ts"
    const frFR = {
@@ -145,46 +159,45 @@ const t = getTranslations(lang, "common");
        about: "À propos",
        link_to: "Lien vers {title}",
        page_num: "Page {num}",
-       // ... 残りのエントリを翻訳する
+       // ... その他のキー
      },
    } as const;
 
    export default frFR;
    ```
 
-3. **新しい辞書を登録する**
+3. **新しい辞書を登録**
 
-   `i18n/index.ts` を開き、新しい辞書をインポートして `createI18n` の `messages` 設定に登録します：
+   `i18n/index.ts` で辞書をインポートし、`createAstroI18n` に登録します：
 
-   ```typescript title="i18n/index.ts" ins={4,13}
+   ```typescript title="i18n/index.ts" ins={4,16}
    import zhHans from "./messages/zh-Hans";
    import enUS from "./messages/en-US";
    import jaJP from "./messages/ja-JP";
    import frFR from "./messages/fr-FR";
 
-   export const { getTranslations, getFormatter, isSupportedLanguage, languages, defaultLanguage } =
-     createI18n({
-       defaultLanguage: "zh-Hans",
-       messages: {
-         "zh-Hans": zhHans,
-         "en-US": enUS,
-         "ja-JP": jaJP,
-         "fr-FR": frFR,
-       },
-     });
+   export const {
+     useTranslations,
+     useLocale,
+     useFormatter,
+     getTranslations,
+     // ...
+   } = createAstroI18n({
+     defaultLanguage: "zh-Hans",
+     messages: {
+       "zh-Hans": zhHans,
+       "en-US": enUS,
+       "ja-JP": jaJP,
+       "fr-FR": frFR,
+     },
+   });
    ```
 
-4. **新しい言語の著者情報を追加する**
+4. **著者情報とヒーローコンテンツを追加**
 
-   `src/content/author/` 以下に対応する言語のディレクトリを作成します（例：`src/content/author/fr-FR/default.mdx`）。
-
-   ```yaml
-   ---
-   name: "Luka"
-   language: "fr-FR"
-   occupation: "Développeur Full Stack"
-   ---
-   ```
+   `src/content/author/` および `src/content/mdx/` 配下にディレクトリとファイルを作成します：
+   - `src/content/author/fr-FR/default.mdx`
+   - `src/content/mdx/fr-FR/hero.mdx`
 
 </Steps>
 
@@ -192,7 +205,7 @@ const t = getTranslations(lang, "common");
 
 ## 多言語記事の執筆
 
-多言語記事を公開するには、`src/content/blog/` に Markdown / MDX ファイルを直接作成します。プロジェクトはフロントマターの `translationKey` を元に、異なる言語バージョンを自動的に関連付けます。
+すべてのブログ記事は言語ごとのサブディレクトリを作らず、`src/content/blog/` に直接配置します。Frontmatter の `translationKey` に基づき、各言語バージョンが自動的に関連付けられます：
 
 <Tabs syncKey="blog-example">
   <TabItem label="中国語版 (介绍.mdx)">
@@ -229,5 +242,5 @@ Post content in English...
 
 > [!NOTE]
 >
-> - **`translationKey`**：同じ記事の異なる言語バージョンには、まったく同一の `translationKey` を使用する必要があります。
-> - **`isCanonical`**：正しい多言語カノニカルリンク（`x-default` と `canonical`）を生成するために、デフォルト言語バージョンでは `true` に設定することを推奨します。
+> - **`translationKey`**：同じ記事のすべての言語バージョンで完全に同一のキーを使用してください。
+> - **`isCanonical`**：デフォルト言語バージョンで `true` を指定することで、正規リンク（`canonical` および `x-default`）が正確に生成されます。

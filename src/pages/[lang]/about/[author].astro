@@ -7,7 +7,7 @@ import Steps from "@/components/mdx/Steps.astro";
 import FileTree from "@/components/mdx/FileTree.astro";
 import Tabs from "@/components/mdx/Tabs.astro";
 import TabItem from "@/components/mdx/TabItem.astro";
-import { getTranslations } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import { slug } from "github-slugger";
 import Icon from "@/components/ui/Icon.astro";
 
@@ -28,16 +28,14 @@ export async function getStaticPaths() {
     });
 }
 
-const { lang } = Astro.params;
 const { author } = Astro.props;
 
 const { name, avatar } = author.data;
 const { Content } = await render(author);
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <RootLayout
-  lang={lang}
   title={`${t("about")} ${name}`}
   description={`${t("about")} ${name}`}
   image={avatar?.src}

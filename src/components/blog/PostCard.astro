@@ -2,20 +2,20 @@
 import Link from "@/components/ui/Link.astro";
 import Topic from "./Topic.astro";
 import FormattedDate from "@/components/ui/FormattedDate.astro";
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations, useLocale } from "~/i18n";
 import type { BlogCoreContent } from "~/lib/content-utils";
 
 type Props = {
   post: BlogCoreContent;
-  lang: Lang;
   showDate?: boolean;
   titleSize?: "default" | "lg";
 };
 
-const { post, lang, showDate = true, titleSize = "default" } = Astro.props;
+const { post, showDate = true, titleSize = "default" } = Astro.props;
 const { id, date, lastmod, title, summary, tags, categories } = post;
+const lang = useLocale();
 const href = `/${lang}/blog/${id}`;
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <div class="container">
@@ -24,7 +24,6 @@ const t = getTranslations(lang, "common");
       <div class="date">
         {lastmod && t("last_modified")}
         <FormattedDate
-          lang={lang}
           date={lastmod ?? date}
           template="compact"
           srText={!lastmod ? t("published_on") : undefined}
@@ -43,7 +42,7 @@ const t = getTranslations(lang, "common");
         {categories && (
           <div class="categories">
             {categories.map((category: string) => (
-              <Topic lang={lang} text={category} type="categories" />
+              <Topic text={category} type="categories" />
             ))}
           </div>
         )}
@@ -53,7 +52,7 @@ const t = getTranslations(lang, "common");
         {tags && (
           <div class="tags">
             {tags.map((tag: string) => (
-              <Topic text={tag} lang={lang} />
+              <Topic text={tag} />
             ))}
           </div>
         )}

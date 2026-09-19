@@ -1,26 +1,25 @@
 ---
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import { type BlogCoreContent } from "~/lib/content-utils";
 import PostCard from "./PostCard.astro";
 
 type Props = {
   posts: BlogCoreContent[];
-  lang: Lang;
 };
 
-const { posts, lang } = Astro.props;
+const { posts } = Astro.props;
 
 if (!posts || posts.length === 0) {
   return null;
 }
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <section class="related-posts" aria-label={t("related_post")}>
   <h2 class="related-title">{t("related_post")}</h2>
   <div class="post-list">
-    {posts.map((post) => <PostCard post={post} lang={lang} titleSize="lg" />)}
+    {posts.map((post) => <PostCard post={post} titleSize="lg" />)}
   </div>
 </section>
 

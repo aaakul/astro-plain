@@ -1,18 +1,17 @@
 ---
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import { type BlogCoreContent } from "~/lib/content-utils";
 import PostCard from "./PostCard.astro";
 
 type Props = {
   posts: BlogCoreContent[];
-  lang: Lang;
   maxDisplay?: number;
   template?: "full" | "compact";
 };
 
-const { posts, lang, maxDisplay, template = "full" } = Astro.props;
+const { posts, maxDisplay, template = "full" } = Astro.props;
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 
 const displayPosts = maxDisplay ? posts.slice(0, maxDisplay) : posts;
 ---
@@ -30,7 +29,7 @@ const displayPosts = maxDisplay ? posts.slice(0, maxDisplay) : posts;
   displayPosts.length > 0 ? (
     <div class="post-list">
       {displayPosts.map((post) => (
-        <PostCard post={post} lang={lang} showDate={template === "full"} />
+        <PostCard post={post} showDate={template === "full"} />
       ))}
     </div>
   ) : (

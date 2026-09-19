@@ -1,13 +1,9 @@
 ---
 // Floating back-to-top button that appears when user scrolls down
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import Icon from "@/components/ui/Icon.astro";
 
-type Props = { lang: Lang };
-
-const { lang } = Astro.props;
-
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <script>

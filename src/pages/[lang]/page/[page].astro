@@ -1,5 +1,5 @@
 ---
-import { AVAILABLE_LANG, getTranslations } from "~/i18n";
+import { AVAILABLE_LANG, useTranslations } from "~/i18n";
 import RootLayout from "@/layouts/RootLayout.astro";
 import { getBlog, getBlogCoreContent, getTopics } from "~/lib/content-utils";
 import TwoColumnLayout from "@/layouts/TwoColumnLayout.astro";
@@ -31,27 +31,22 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
 const { lang } = Astro.params;
 const { page } = Astro.props;
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 
 const { tagList, categoryList } = await getTopics(lang);
 ---
 
-<RootLayout
-  lang={lang}
-  noindex
-  languageSwitchLinks={new Map(AVAILABLE_LANG.map((l) => [l, `/${l}/`]))}
->
+<RootLayout noindex languageSwitchLinks={new Map(AVAILABLE_LANG.map((l) => [l, `/${l}/`]))}>
   <h1 slot="header">{t("all_posts")}</h1>
 
   <TwoColumnLayout slot="content">
-    <PostList posts={page.data} lang={lang} slot="content" />
+    <PostList posts={page.data} slot="content" />
 
-    <TopicPanel lang={lang} categories={categoryList} tags={tagList} slot="sidebar-start" />
+    <TopicPanel categories={categoryList} tags={tagList} slot="sidebar-start" />
 
     {
       page.lastPage > 1 && (
         <Pagination
-          lang={lang}
           totalPages={page.lastPage}
           currentPage={page.currentPage}
           basePath={`/${lang}`}

@@ -1,12 +1,9 @@
 ---
 // Mobile floating button that opens a full-screen Table of Contents overlay
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import Icon from "@/components/ui/Icon.astro";
 
-type Props = { lang: Lang };
-
-const { lang } = Astro.props;
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <script>

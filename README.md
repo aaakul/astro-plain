@@ -12,7 +12,7 @@ A minimalist multilingual static blog template built on [Astro](https://astro.bu
 
 - **High-Performance Minimal Architecture**: Built on [Astro](https://astro.build/) Static Site Generation (SSG), with no CSS / UI framework dependencies. Achieves a perfect 100/100 Lighthouse score across all categories.
 - **Internationalization (i18n) & SEO**:
-  - Built-in Simplified Chinese, English, and Japanese translations, powered by [`@aaakul/ts-intl`](https://github.com/aaakul/ts-intl).
+  - Built-in Simplified Chinese, English, and Japanese translations, powered by [`ts-intl-astro`](https://github.com/aaakul/ts-intl).
   - Subpath-based static multilingual routing (e.g., `/zh-Hans/`, `/en-US/`, `/ja-JP/`).
   - Smart language redirect: automatically selects the site language based on language preference cookie or browser language.
   - Automatic generation of multilingual SEO tags (`hreflang` / `x-default` / Open Graph).

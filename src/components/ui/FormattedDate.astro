@@ -1,15 +1,16 @@
 ---
 // Localized date formatter rendering a semantic <time> tag
-import type { Lang } from "~/i18n";
+import { useLocale, type Lang } from "~/i18n";
 
 type Props = {
   date: Date;
   template?: "full" | "compact";
   srText?: string;
-  lang: Lang;
+  lang?: Lang;
 };
 
-const { date, template = "full", srText, lang } = Astro.props;
+const { date, template = "full", srText, lang: propLang } = Astro.props;
+const lang = propLang || useLocale();
 
 const target = new Date(date);
 const now = new Date();

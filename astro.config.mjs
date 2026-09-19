@@ -12,6 +12,7 @@ import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-s
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import pagefind from "astro-pagefind";
 import pluginPagefindIgnore from "./lib/expressive-code-pagefind-ignore-plugin";
+import tsIntl from "ts-intl-astro";
 
 export default defineConfig({
   site: SiteConfig.siteUrl,
@@ -44,10 +45,11 @@ export default defineConfig({
     }),
     mdx(),
     sitemap({
-      // Exclude page/1 to avoid duplicate URLs with the main list page
-      filter: (page) => !page.endsWith("/page/1"),
+      // Exclude /page/1 to avoid duplicate URLs with the main list page
+      filter: (page) => !/\/page\/1\/?$/.test(page),
     }),
     pagefind(),
+    tsIntl(),
   ],
   vite: {
     build: {

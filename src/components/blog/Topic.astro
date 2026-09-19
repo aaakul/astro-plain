@@ -1,6 +1,6 @@
 ---
 // Badge link component for a single tag or category
-import { type Lang } from "~/i18n";
+import { useLocale, type Lang } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 import { slug } from "github-slugger";
 import type { Props as LinkProps } from "@/components/ui/Link.astro";
@@ -8,11 +8,12 @@ import Icon from "@/components/ui/Icon.astro";
 
 type Props = {
   text: string;
-  lang: Lang;
+  lang?: Lang;
   type?: "tags" | "categories";
 } & Omit<LinkProps, "href">;
 
-const { text, lang, type = "tags", class: className, ...rest } = Astro.props;
+const { text, lang: propLang, type = "tags", class: className, ...rest } = Astro.props;
+const lang = propLang || useLocale();
 ---
 
 <style>
@@ -34,7 +35,7 @@ const { text, lang, type = "tags", class: className, ...rest } = Astro.props;
   }
 </style>
 
-<Link href={`/${lang}/${type}/${slug(text)}`} lang={lang} class={className} {...rest}>
+<Link href={`/${lang}/${type}/${slug(text)}`} class={className} {...rest}>
   {
     type === "tags" ? <span aria-hidden="true">#</span> : <Icon name="seti:folder" size="0.875em" />
   }<span class="name">{text}</span>

@@ -1,5 +1,5 @@
 ---
-import { AVAILABLE_LANG, getTranslations } from "~/i18n";
+import { AVAILABLE_LANG, useTranslations } from "~/i18n";
 import AuthorLayout from "@/layouts/AuthorLayout.astro";
 import RootLayout from "@/layouts/RootLayout.astro";
 import { getCollection, render } from "astro:content";
@@ -29,11 +29,10 @@ const { name, avatar } = author.data;
 
 const { Content } = await render(author);
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 <RootLayout
-  lang={lang}
   title={`${t("about")} ${name}`}
   description={`${t("about")} ${name}`}
   image={avatar?.src}
@@ -42,5 +41,5 @@ const t = getTranslations(lang, "common");
 >
   <AuthorLayout {...author.data} slot="content">
     <Content components={{ a: CustomLink, Steps: Steps, FileTree, Tabs, TabItem, Icon }} />
-  </AuthorLayout></RootLayout
->
+  </AuthorLayout>
+</RootLayout>

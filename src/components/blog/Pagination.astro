@@ -1,17 +1,16 @@
 ---
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations } from "~/i18n";
 import Link from "@/components/ui/Link.astro";
 import Icon from "@/components/ui/Icon.astro";
 
 type Props = {
-  lang: Lang;
   totalPages: number;
   currentPage: number;
   basePath: string;
   firstPage?: string;
 };
 
-const { lang, totalPages, currentPage, basePath, firstPage = basePath } = Astro.props;
+const { totalPages, currentPage, basePath, firstPage = basePath } = Astro.props;
 
 // Calculates the target URL for a given page number
 const getPageHref = (page: number) => (page === 1 ? `${firstPage}` : `${basePath}/page/${page}`);
@@ -55,7 +54,7 @@ const pageButtons = getPageButtons();
 const prevPage = currentPage > 1 ? currentPage - 1 : null;
 const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 
-const t = getTranslations(lang, "common");
+const t = useTranslations("common");
 ---
 
 {

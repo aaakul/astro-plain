@@ -1,6 +1,6 @@
 ---
 // Previous/next post navigation links displayed at the bottom of a blog article
-import { getTranslations, type Lang } from "~/i18n";
+import { useTranslations, useLocale } from "~/i18n";
 import { type BlogCoreContent } from "~/lib/content-utils";
 import Link from "@/components/ui/Link.astro";
 import Icon from "@/components/ui/Icon.astro";
@@ -8,16 +8,16 @@ import Icon from "@/components/ui/Icon.astro";
 type Props = {
   prev?: BlogCoreContent | null;
   next?: BlogCoreContent | null;
-  lang: Lang;
 };
 
-const { prev, next, lang } = Astro.props;
+const { prev, next } = Astro.props;
 
 if (!prev && !next) {
   return null;
 }
 
-const t = getTranslations(lang, "common");
+const lang = useLocale();
+const t = useTranslations("common");
 
 const prevLabel = t("prev_post", { title: "" });
 const nextLabel = t("next_post", { title: "" });
